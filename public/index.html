@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cellular Automaton</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+    <h1 id="lastServerMessage">Connecting to server...</h1>
+  <canvas id="canvas" width="640" height="480"></canvas>
+  <script src="js/automaton.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+
+    socket.on("serverMessage", (arg) => {
+        document.getElementById("lastServerMessage").innerHTML = arg;
+    })
+    
+  </script>
+</body>
+</html>
