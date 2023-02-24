@@ -12,8 +12,8 @@ grid[Math.floor(gridSize / 2)][0] = 1;
 
 // Define the rules for updating the grid
 function updateGrid() {
-  for (let x = 0; x < gridSize; x++) {
-    for (let y = 0; y < gridSize; y++) {
+  for (let x = 0; x < 680; x++) {
+    for (let y = 0; y < 480; y++) {
       let neighbors = 0;
       for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {

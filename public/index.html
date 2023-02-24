@@ -10,15 +10,52 @@
 </head>
 <body>
     <h1 id="lastServerMessage">Connecting to server...</h1>
+    <button id="clicker">Bingo</button>
   <canvas id="canvas" width="640" height="480"></canvas>
-  <script src="js/automaton.js"></script>
+  <script src="../app/game.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
     var socket = io();
+    var currentState;
+    var nextState;
 
-    socket.on("serverMessage", (arg) => {
-        document.getElementById("lastServerMessage").innerHTML = arg;
+
+    socket.on("connected", (arg) => {
+      document.getElementById("lastServerMessage").innerHTML = "Connected.";
     })
+
+    socket.on("initialState", (arg) => {
+      for (let x = 0; x < 68; x++) {
+        for (let y = 0; y < 48; y++) {
+          if(arg[y][x] == 1){
+            document.getElementById('canvas').getContext('2d').fillRect(x * 10, y * 10, 10, 10);
+          }            
+        }
+      }
+    })
+
+    socket.on("drawState", (arg) => {
+      document.getElementById('canvas').getContext('2d').clearRect(0, 0, 680, 480);
+      for (let y = 0; y < 48; y++) {
+        for (let x = 0; x < 68; x++) {           
+          if (arg[y][x] === 1) {
+            document.getElementById('canvas').getContext('2d').fillRect(x * 10, y * 10, 10, 10);
+          }
+        }
+      }      
+    })
+
+    document.getElementById('clicker').addEventListener('click', function() {
+      socket.emit("buttonClicked");
+    });
+
+    document.getElementById('canvas').addEventListener('click', (e) => {
+      var rect = document.getElementById('canvas').getBoundingClientRect();
+      returnArray = new Array(2);
+      returnArray[0] = e.clientY - rect.top      
+      returnArray[1] = e.clientX - rect.left;;
+      socket.emit("canvasClicked", returnArray);
+    });
     
   </script>
 </body>

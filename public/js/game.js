@@ -4,14 +4,9 @@ const HEIGHT = 480;
 
 let state = [];
 
-function initialize() {
-  // Initialize the game state here.
-  state = createInitialState();
-}
-
 function update() {
   // Update the game state here.
-  state = getNextState(state);
+  return state = getNextState(state);
 }
 
 function draw(context) {
@@ -34,30 +29,38 @@ function createInitialState() {
   for (let y = 0; y < rows; y++) {
     state[y] = new Array(cols).fill(0);
   }
-  state[0][0] = 1;
-  state[1][1] = 1;
-  state[2][1] = 1;
-  state[2][2] = 1;
-  state[3][1] = 1;
+  state[12][10] = 1;//
+  state[13][11] = 1;//
+  state[11][12] = 1;//
+  state[12][12] = 1;//
+  state[13][12] = 1;//
+
   return state;
 }
 
-function getNextState(currentState) {
+function getNextState(currentState) {  
   // Calculate and return the next game state based on the current state.
-  const rows = currentState.length;
-  const cols = currentState[0].length;
+  const rows = 48;
+  const cols = 68;
   const nextState = new Array(rows);
   for (let y = 0; y < rows; y++) {
     nextState[y] = new Array(cols).fill(0);
   }
+
+  
+
   // Calculate the next state here.
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const neighbors = countNeighbors(currentState, x, y);
+
+
       if (currentState[y][x] === 1 && neighbors >= 2 && neighbors <= 3) {
         nextState[y][x] = 1;
       } else if (currentState[y][x] === 0 && neighbors === 3) {
         nextState[y][x] = 1;
+      } else {
+        nextState[y][x] = 0;
       }
     }
   }
@@ -87,8 +90,4 @@ function countNeighbors(state, x, y) {
   return count;
 }
 
-export default {
-  initialize,
-  update, 
-  draw
-};
+module.exports = { state, createInitialState, getNextState, draw};
