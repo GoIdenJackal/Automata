@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="css/home.css"> 
+  <title>Cellular Automaton</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<style>
+
+h1{
+  margin-left: 150px;
+  text-align: left;
+  font-size: 50px;
+}
+
+.button {
+  justify-self: start;
+  float: left;
+  display: flex;
+  padding: 15px 25px;
+  margin-left: 50px;
+  margin-bottom: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #ffffff;
+  background-color: #3f9bd8;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 2px 4px #cee5ff;
+}
+
+.button:hover {
+  background-color: #3586bd
+}
+
+.button:active {
+  background-color: #265d81;
+  box-shadow: 2 3px #666;
+  transform: translateY(2px);
+}
+</style>
+<body>
+    <h1>Cellular Automaton Simulation - Conway's Game of Life</h1>
+    <button class="button" id="nextState">Next Gamestate</button>
+    <button class="button" id="saveState">Log Gamestate</button>
+  <canvas id="canvas" width="2600" height="1400"></canvas>
+  <script src="js/game.js"></script>
+  <script src="socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+    var currentState;
+    var nextState;
+    var lastMoved = new Array(2);
+    var lastReceivedState = null;
+    const COLS = 260;
+    const ROWS = 140;
+
+    lastMoved[0] = -1;
+
+    socket.on("initialState", (arg) => {
+      lastReceivedState = arg;
+      for (let x = 0; x < COLS; x++) {
+        for (let y = 0; y < ROWS; y++) {
+          if(arg[y][x] == 1){
+            document.getElementById('canvas').getContext('2d').fillRect(x * 10, y * 10, 10, 10);
+          }            
+        }
+      }
+    })
+
+    socket.on("drawState", (arg) => {
+      lastReceivedState = arg;
+      document.getElementById('canvas').getContext('2d').clearRect(0, 0, 6800, 4800);
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {           
+          if (arg[y][x] === 1) {
+            document.getElementById('canvas').getContext('2d').fillRect(x * 10, y * 10, 10, 10);
+          }
+        }
+      }      
+    })
+
+    socket.on("updateClientState", (arg) => {
+      lastReceivedState = arg;      
+    })
+
+    document.getElementById('nextState').addEventListener('click', function() {
+      socket.emit("buttonClicked");
+    });
+
+    document.getElementById('saveState').addEventListener('click', function() {
+      socket.emit("printState");
+    });
+
+    document.getElementById('canvas').addEventListener('click', (e) => {
+      var rect = document.getElementById('canvas').getBoundingClientRect();
+      returnArray = new Array(2);
+      returnArray[0] = e.clientY - rect.top;      
+      returnArray[1] = e.clientX - rect.left - 1;
+      socket.emit("canvasClicked", returnArray);
+    });
+
+    document.getElementById('canvas').addEventListener('mousemove', (e) => {
+
+      var rect = document.getElementById('canvas').getBoundingClientRect();
+      returnArray = new Array(2);
+      returnArray[0] = e.clientY - rect.top;      
+      returnArray[1] = e.clientX - rect.left - 1;
+
+      var mouseY = (Math.ceil(returnArray[0] / 10));
+      var mouseX = (Math.ceil(returnArray[1] / 10));
+
+      socket.emit("mouseMoved");
+      if(lastMoved !== returnArray && lastMoved[0] !== [-1]){
+        document.getElementById('canvas').getContext('2d').clearRect((Math.ceil(lastMoved[1] / 10) - 1)  * 10, Math.ceil((lastMoved[0] / 10) - 1) * 10, 10, 10);
+        document.getElementById('canvas').getContext('2d').fillRect((Math.ceil(returnArray[1] / 10) - 1)  * 10, Math.ceil((returnArray[0] / 10) - 1) * 10, 10, 10);
+      }
+      lastMoved = returnArray;
+
+      if(lastReceivedState !== null){
+        var context = document.getElementById('canvas').getContext('2d');
+        context.clearRect(0, 0, COLS * 10, ROWS * 10);
+        for (let y = 0; y < ROWS; y++) {
+          for (let x = 0; x < COLS; x++) { 
+            if (lastReceivedState[y][x] === 1) {
+              context.fillRect(x * 10, y * 10, 10, 10);
+            } else if (y == mouseY - 1 && x == mouseX - 1){
+              context.fillStyle = '#EAEAEA';
+              context.fillRect(x * 10, y * 10, 10, 10);
+              context.fillStyle = '#000000';
+            }
+          }
+        }  
+      }                
+    });
+    
+  </script>
+</body>
+</html>
