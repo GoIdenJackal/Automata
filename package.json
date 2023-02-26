@@ -1,30 +1,34 @@
 {
-  "name": "automata",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
   "scripts": {
-    "start": "node public/js/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "dev": "nodemon js/server.js",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/GoIdenJackal/Automata.git"
+  "engines": {
+    "node": "16"
   },
-  "author": "Gus",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/GoIdenJackal/Automata/issues"
-  },
-  "homepage": "https://github.com/GoIdenJackal/Automata#readme",
+  "main": "js/server.js",
   "dependencies": {
+    "firebase-admin": "^11.5.0",
+    "firebase-functions": "^4.2.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "firebase": "^9.17.1",
-    "firebase-functions": "^4.2.1",
     "helmet": "^6.0.1",
     "nodemon": "^2.0.20",
     "p5": "^1.6.0",
     "socket.io": "^4.6.1"
-  }
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.0.0"
+  },
+  "private": true
 }
